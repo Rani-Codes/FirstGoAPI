@@ -7,23 +7,23 @@ import (
 )
 
 type Inventory struct {
-	id   int
-	item string
+	Id   int
+	Item string
 }
 
 var InvList = []Inventory{
-	{id: 1, item: "banana"},
-	{id: 2, item: "apple"},
-	{id: 3, item: "pear"},
+	{Id: 1, Item: "banana"},
+	{Id: 2, Item: "apple"},
+	{Id: 3, Item: "pear"},
 }
 
 func HelloWorld(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Hello World")
 }
 
-func (i *Inventory) GetAllItems(w http.ResponseWriter, r *http.Request) {
-	for j := 0; j < len(i.item); j++ {
-		fmt.Fprintf(w, "The items inside of the inventory: %s", i.item[j])
+func GetAllItems(w http.ResponseWriter, r *http.Request) {
+	for _, inv := range InvList {
+		fmt.Fprintf(w, "ID: %d, Item: %s\n", inv.Id, inv.Item)
 	}
 }
 
