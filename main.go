@@ -9,8 +9,8 @@ import (
 )
 
 type Inventory struct {
-	Id   int
-	Item string
+	Id   int    `json:"id"`
+	Item string `json:"item"`
 }
 
 type ErrorResponse struct {
