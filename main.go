@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,6 +11,10 @@ import (
 type Inventory struct {
 	Id   int
 	Item string
+}
+
+type ErrorResponse struct {
+	Error string
 }
 
 var InvList = []Inventory{
@@ -23,27 +28,29 @@ func HelloWorld(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetAllItems(w http.ResponseWriter, r *http.Request) {
-	for _, inv := range InvList {
-		fmt.Fprintf(w, "ID: %d, Item: %s\n", inv.Id, inv.Item)
-	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(InvList)
 }
 
 func GetItemById(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	IdString := r.URL.Path[len("/items/"):]
 	id, err := strconv.Atoi(IdString)
 	if err != nil {
-		http.Error(w, "Invalid ID", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ErrorResponse{Error: "Invalid ID"})
 		return
 	}
 
 	for _, inv := range InvList {
 		if inv.Id == id {
-			fmt.Fprintf(w, "Id %d returned: %s\n", id, inv.Item)
+			json.NewEncoder(w).Encode(inv)
 			return
 		}
 	}
-
-	http.NotFound(w, r)
+	w.WriteHeader(http.StatusNotFound)
+	json.NewEncoder(w).Encode(ErrorResponse{Error: "Page Not Found"})
 }
 
 func main() {
