@@ -24,7 +24,7 @@ var InvList = []Inventory{
 }
 
 func HelloWorld(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Hello World")
+	json.NewEncoder(w).Encode("Hello World")
 }
 
 func GetAllItems(w http.ResponseWriter, r *http.Request) {
@@ -53,10 +53,33 @@ func GetItemById(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(ErrorResponse{Error: "Page Not Found"})
 }
 
+func CreateItem(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	if r.Method != http.MethodPost {
+		json.NewEncoder(w).Encode(ErrorResponse{Error: "Method Not Allowed, Use POST"})
+		return
+	}
+
+	var newItem Inventory
+	err := json.NewDecoder(r.Body).Decode(&newItem)
+	if err != nil {
+		json.NewEncoder(w).Encode(ErrorResponse{Error: "Invalid Request Body"})
+		return
+	}
+
+	InvList = append(InvList, newItem)
+
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(newItem)
+
+}
+
 func main() {
 	http.HandleFunc("/", HelloWorld)
 	http.HandleFunc("/items", GetAllItems)
 	http.HandleFunc("/items/", GetItemById)
+	http.HandleFunc("/createItems", CreateItem)
 
 	fmt.Println("Server running at localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
