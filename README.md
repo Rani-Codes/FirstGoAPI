@@ -11,3 +11,13 @@ To learn the core mechanics of Go without the magic of a framework.
 - Lesson 2: Include struct tags for JSON APIs to match industry standard.
     - JSON keys must be lowercase
 
+### Final Remarks
+This marks the completion of my first REST API project using Go's standard ```net/http``` library. It was a great learning experience that demonstrated the power and simplicity of the standard library. At the same time, it also revealed some limitations that make adopting a lightweight framework like **Chi** appealing for future projects.
+
+- Why use a framework?
+    - Multiple methods supported on a single path. With chi I can simply write ```r.Delete("/items/{id}", DeleteItemById) ``` and have it confirm both my HTTP Method and a query paramter.
+        - Eliminates the need for workarounds like using /createItems, /deleteItems/, or writing switch cases manually.
+    - No more method checks. I did one here for POST but ***chi*** handles that internally by routing based on both the path and method — no extra logic required..
+    - Can finally move things outside of main.go
+        - Better project organization through middleware support, route grouping, and controller separation. Good for more complex projects
+    
