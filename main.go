@@ -75,11 +75,34 @@ func CreateItem(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func DeleteItemById(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	IdString := r.URL.Path[len("/deleteItems/"):]
+	id, err := strconv.Atoi(IdString)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ErrorResponse{Error: "Invalid ID"})
+		return
+	}
+
+	for i, inv := range InvList {
+		if inv.Id == id {
+			InvList = append(InvList[:i], InvList[i+1:]...)
+			json.NewEncoder(w).Encode(map[string]string{"message": "deleted"})
+			return
+		}
+	}
+	w.WriteHeader(http.StatusNotFound)
+	json.NewEncoder(w).Encode(ErrorResponse{Error: "Page Not Found"})
+}
+
 func main() {
 	http.HandleFunc("/", HelloWorld)
 	http.HandleFunc("/items", GetAllItems)
 	http.HandleFunc("/items/", GetItemById)
 	http.HandleFunc("/createItems", CreateItem)
+	http.HandleFunc("/deleteItems/", DeleteItemById)
 
 	fmt.Println("Server running at localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
